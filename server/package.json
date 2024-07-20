@@ -19,10 +19,12 @@
         "test": "vitest run",
         "test:dev": "vitest dev",
         "test:cov": "vitest run --coverage",
-        "prepare": "husky"
+        "prepare": "husky",
+        "build-client": "rm -rf public && cd .. &&  cd client && npm run build && cd .. &&  mv client/dist server/public"
     },
     "dependencies": {
         "@asteasolutions/zod-to-openapi": "^7.0.0",
+        "@prisma/client": "^5.17.0",
         "cors": "^2.8.5",
         "dotenv": "^16.4.5",
         "envalid": "^8.0.0",
@@ -44,6 +46,7 @@
         "husky": "^9.0.11",
         "lint-staged": "^15.2.2",
         "pino-pretty": "^11.0.0",
+        "prisma": "^5.17.0",
         "rimraf": "^6.0.0",
         "supertest": "^7.0.0",
         "tsup": "^8.0.2",
