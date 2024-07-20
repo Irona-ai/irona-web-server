@@ -20,7 +20,8 @@
         "test:dev": "vitest dev",
         "test:cov": "vitest run --coverage",
         "prepare": "husky",
-        "build-client": "rm -rf public && cd .. &&  cd client && npm run build && cd .. &&  mv client/dist server/public"
+        "build-client": "rm -rf public && cd .. &&  cd client && npm run build && cd .. &&  mv client/dist server/public",
+        "build-app": "npm run build-client && npm run prod"
     },
     "dependencies": {
         "@asteasolutions/zod-to-openapi": "^7.0.0",
