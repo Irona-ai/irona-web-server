@@ -29,7 +29,15 @@ app.use(rateLimiter)
 app.use(requestLogger)
 
 // Routes
-app.use('/health-check', healthCheckRouter)
+// app.use('/health-check', healthCheckRouter)
+
+// Healthcheck handler
+app.get('/healthz', (req, res) => {
+    res.json({
+        status: 'OK',
+    })
+})
+
 app.use('/api/users', userRouter)
 
 // Swagger UI
