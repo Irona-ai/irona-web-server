@@ -8,43 +8,53 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-}
-
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
-}
-
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  name    String?
-  posts   Post[]
-  profile Profile?
-  test String
-  status Status
+  id             Int      @id @default(autoincrement())
+  firstname      String
+  lastname       String
+  profilePicture String? // optional field
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
+  status         Status   @default(ACTIVE)
+  role           Role     @default(USER)
+  Auth           Auth?
+}
+
+model Auth {
+  userid     Int       @id
+  email      String    @unique
+  password   String
+  isVerified Boolean   @default(false)
+  OTP        String?
+  User       User      @relation(fields: [userid], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @default(now()) @updatedAt
+  Session    Session[]
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userid       Int
+  refreshToken String
+  createdAt    DateTime @default(now())
+  Auth         Auth     @relation(fields: [userid], references: [userid], onDelete: Cascade)
 }
 
 enum Status {
-  Unknown
-  Draft
-  InProgress
-  InReview
-  Published
+  ACTIVE
+  INACTIVE
+}
+
+enum Role {
+  USER
+  ADMIN
 }

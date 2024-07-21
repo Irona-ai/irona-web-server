@@ -1,0 +1,49 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  firstname String [not null]
+  lastname String [not null]
+  profilePicture String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  status Status [not null, default: 'ACTIVE']
+  role Role [not null, default: 'USER']
+  Auth Auth
+}
+
+Table Auth {
+  userid Int [pk]
+  email String [unique, not null]
+  password String [not null]
+  isVerified Boolean [not null, default: false]
+  OTP String
+  User User [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  Session Session [not null]
+}
+
+Table Session {
+  id Int [pk, increment]
+  userid Int [not null]
+  refreshToken String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  Auth Auth [not null]
+}
+
+Enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+Enum Role {
+  USER
+  ADMIN
+}
+
+Ref: Auth.userid - User.id [delete: Cascade]
+
+Ref: Session.userid > Auth.userid [delete: Cascade]

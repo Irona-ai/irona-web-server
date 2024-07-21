@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express from 'express'
+import express, { Request } from 'express'
 import helmet from 'helmet'
 import { pino } from 'pino'
 import path from 'path'
@@ -10,7 +10,9 @@ import errorHandler from '@/common/middleware/errorHandler'
 import rateLimiter from '@/common/middleware/rateLimiter'
 import requestLogger from '@/common/middleware/requestLogger'
 import { env } from '@/common/utils/envConfig'
-
+import v1Router from '@/routes/v1'
+import passport from 'passport'
+import cookieSession from 'cookie-session'
 const logger = pino({ name: 'server start' })
 const app = express()
 
@@ -20,25 +22,45 @@ app.set('trust proxy', true)
 // Serve client
 app.use('/', express.static(path.join(__dirname, '..', 'public')))
 
+// Rate Limiter
+app.use(rateLimiter)
+
+// Security
+app.use(helmet())
+
 // Middlewares
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))
-app.use(helmet())
-app.use(rateLimiter)
+
+// JSON
+app.use(express.json())
+
+// Cookie Parser // Add session to Request
+app.use(
+    cookieSession({
+        name: 'session',
+        secret: env.COOKIE_KEY,
+        httpOnly: true,
+        secure: env.isProduction,
+        sameSite: 'lax',
+        signed: true,
+    })
+)
+
+// Passport Middleware
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Request logging
 app.use(requestLogger)
 
 // Routes
-// app.use('/health-check', healthCheckRouter)
 
 // Healthcheck handler
-app.get('/healthz', (req, res) => {
-    res.json({
-        status: 'OK',
-    })
-})
+app.use('/health-check', healthCheckRouter)
 
-app.use('/api/users', userRouter)
+// app.use('/api/users', userRouter) // TODO: remove
+
+app.use('/api/v1', v1Router)
 
 // Swagger UI
 app.use(openAPIRouter)
