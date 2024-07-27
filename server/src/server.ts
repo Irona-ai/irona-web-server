@@ -18,7 +18,7 @@ const app = express()
 app.set('trust proxy', true)
 
 // Serve client
-app.use('/', express.static(path.join(__dirname, '..', 'public')))
+app.use(express.static(path.join(__dirname, '..', 'client-build')))
 
 // Middlewares
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))
