@@ -4,11 +4,15 @@
  */
 import path from 'path'
 import { build } from 'vite'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
 
 export default function HotBuild() {
     let bundling = false
     const hmrBuild = async () => {
         bundling = true
+        const __filename = fileURLToPath(import.meta.url)
+        const __dirname = dirname(__filename)
         await build({
             build: {
                 outDir: path.resolve(__dirname, '../server/client-build'),
