@@ -4,7 +4,6 @@ import helmet from 'helmet'
 import { pino } from 'pino'
 import path from 'path'
 import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter'
-import { userRouter } from '@/api/user/userRouter'
 import errorHandler from '@/common/middleware/errorHandler'
 import rateLimiter from '@/common/middleware/rateLimiter'
 import requestLogger from '@/common/middleware/requestLogger'
@@ -36,11 +35,6 @@ app.get('/healthz', (req, res) => {
         status: 'OK',
     })
 })
-
-// app.use('/api/users', userRouter)
-
-// // Swagger UI
-// app.use(openAPIRouter)
 
 // Error handlers
 app.use(errorHandler())
