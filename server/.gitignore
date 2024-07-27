@@ -27,3 +27,4 @@ dist-ssr
 *.sw?
 .vscode/
 /client-build
+tmp/
