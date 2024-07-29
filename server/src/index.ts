@@ -1,5 +1,11 @@
 import { env } from '@/common/utils/envConfig'
 import { app, logger } from '@/server'
+import { LooseAuthProp } from '@clerk/clerk-sdk-node'
+declare global {
+    namespace Express {
+        interface Request extends LooseAuthProp {}
+    }
+}
 
 const server = app.listen(env.PORT, () => {
     const { NODE_ENV, PORT } = env

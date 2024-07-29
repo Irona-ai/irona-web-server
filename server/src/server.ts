@@ -1,5 +1,5 @@
 import cors from 'cors'
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import { pino } from 'pino'
 import path from 'path'
@@ -8,6 +8,9 @@ import errorHandler from '@/common/middleware/errorHandler'
 import rateLimiter from '@/common/middleware/rateLimiter'
 import requestLogger from '@/common/middleware/requestLogger'
 import { env } from '@/common/utils/envConfig'
+import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node'
+import { ClerkError } from '@/constants/clerk.constants'
+import webhooksRouter from '@/routes/webhooks.routes'
 
 const logger = pino({ name: 'server start' })
 const app = express()
@@ -18,7 +21,9 @@ app.set('trust proxy', true)
 // Serve client
 app.use(express.static(path.join(__dirname, '..', 'client-build')))
 
-// Middlewares
+/**
+ * Middlewares
+ */
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))
 app.use(helmet())
 app.use(rateLimiter)
@@ -29,11 +34,24 @@ app.use(requestLogger)
 // Routes
 app.use('/health-check', healthCheckRouter)
 
-// Healthcheck handler
-app.get('/healthz', (req, res) => {
-    res.json({
-        status: 'OK',
-    })
+app.use('/api/v1/webhooks', webhooksRouter)
+
+// Use the strict middleware that raises an error when unauthenticated
+app.use(ClerkExpressRequireAuth())
+
+app.use('/api/v1/users', async (req, res, next) => {
+    console.log('req.auth', req.auth.userId)
+    const userList = await clerkClient.users.getUser(req.auth.userId!)
+    res.json(userList)
+})
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.log('err', err.message)
+
+    if (err.message === ClerkError.Unauthenticated) {
+        return res.status(401).json({ message: 'Unauthenticated!' })
+    }
+    res.status(500).json({ message: 'Internal Server Error' })
 })
 
 // Error handlers
