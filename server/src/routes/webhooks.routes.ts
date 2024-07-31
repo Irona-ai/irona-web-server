@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 import WebhookController from '@/controller/webhook.controller';
-import { clerkWebhookMiddleware } from '@/common/middleware/clerkWebhook';
+import { clerkWebhookMiddleware } from '@/middleware/clerkWebhook';
 
 const webhooksRouter = Router();
 

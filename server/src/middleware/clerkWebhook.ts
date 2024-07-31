@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { env } from '@/common/utils/envConfig';
+import { env } from '@/utils/envConfig';
 import { Webhook } from 'svix';
 import { pino } from 'pino';
 const logger = pino({ name: 'clerk webhooks' });

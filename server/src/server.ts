@@ -1,16 +1,17 @@
 import cors from 'cors';
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import helmet from 'helmet';
 import { pino } from 'pino';
 import path from 'path';
-import { healthCheckRouter } from '@/api/healthCheck/healthCheckRouter';
-import errorHandler from '@/common/middleware/errorHandler';
-import rateLimiter from '@/common/middleware/rateLimiter';
-import requestLogger from '@/common/middleware/requestLogger';
-import { env } from '@/common/utils/envConfig';
+import { healthCheckRouter } from '@/routes/healthCheck.routes';
+import { errorMiddleware, unexpectedRequest } from '@/middleware/errorHandler';
+import rateLimiter from '@/middleware/rateLimiter';
+import requestLogger from '@/middleware/requestLogger';
+import { env } from '@/utils/envConfig';
 import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
-import { ClerkError } from '@/constants/clerk.constants';
 import webhooksRouter from '@/routes/webhooks.routes';
+import { ApiResponse } from '@/common/models/serviceResponse';
+import { StatusCodes } from 'http-status-codes';
 
 const logger = pino({ name: 'server start' });
 const app = express();
@@ -41,23 +42,18 @@ app.use(express.json()); // check clerk body parser
 app.use(ClerkExpressRequireAuth());
 
 // TODO: middleware to check if user exists in irona db in 2sec interval
-
+//validateRequest(UserSchema)
 app.use('/api/v1/users', async (req, res) => {
     console.log('req.auth', req.auth.userId);
     const userList = await clerkClient.users.getUser(req.auth.userId!);
-    res.json(userList);
+    const response = ApiResponse.success('', userList, StatusCodes.OK);
+    res.status(response.statusCode).json(response);
 });
 
-app.use((err: Error, req: Request, res: Response) => {
-    console.log('err', err.message);
+// Handle errors
+app.use(errorMiddleware);
 
-    if (err.message === ClerkError.Unauthenticated) {
-        return res.status(401).json({ message: 'Unauthenticated!' });
-    }
-    res.status(500).json({ message: 'Internal Server Error' });
-});
-
-// Error handlers
-app.use(errorHandler());
+// Error handler 404
+app.use(unexpectedRequest);
 
 export { app, logger };
