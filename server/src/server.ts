@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, '..', 'client-build')));
 /**
  * Middlewares
  */
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+app.use(cors({ credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
 
