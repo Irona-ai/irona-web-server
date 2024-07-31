@@ -1,13 +1,16 @@
-import { Router } from 'express'
-import bodyParser from 'body-parser'
-import WebhookController from '@/controller/webhook.controller'
+import { Router } from 'express';
+import bodyParser from 'body-parser';
+import WebhookController from '@/controller/webhook.controller';
+import { clerkWebhookMiddleware } from '@/common/middleware/clerkWebhook';
 
-const webhooksRouter = Router()
+const webhooksRouter = Router();
 
 webhooksRouter.post(
     '/',
     bodyParser.raw({ type: 'application/json' }),
-    WebhookController.verifyWebhook
-)
+    clerkWebhookMiddleware,
+    WebhookController.handleEvent
+);
 
-export default webhooksRouter
+export default webhooksRouter;
+// start db -> env
