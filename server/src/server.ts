@@ -9,9 +9,10 @@ import rateLimiter from '@/middleware/rateLimiter';
 import requestLogger from '@/middleware/requestLogger';
 import { env } from '@/utils/envConfig';
 import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
-import webhooksRouter from '@/routes/webhooks.routes';
+import webhooksRouter from '@/routes/v1/webhooks.routes';
 import { ApiResponse } from '@/common/models/serviceResponse';
 import { StatusCodes } from 'http-status-codes';
+import v1Router from './routes/v1';
 
 const logger = pino({ name: 'server start' });
 const app = express();
@@ -34,21 +35,14 @@ app.use(requestLogger);
 
 // Routes
 app.use('/health-check', healthCheckRouter);
-app.use('/api/v1/webhooks', webhooksRouter);
+app.use('/api/webhooks/v1/clerk', webhooksRouter);
 
-app.use(express.json()); // check clerk body parser
+v1Router.use(express.json());
 
-// Use the strict middleware that raises an error when unauthenticated
 app.use(ClerkExpressRequireAuth());
-
 // TODO: middleware to check if user exists in irona db in 2sec interval
-//validateRequest(UserSchema)
-app.use('/api/v1/users', async (req, res) => {
-    console.log('req.auth', req.auth.userId);
-    const userList = await clerkClient.users.getUser(req.auth.userId!);
-    const response = ApiResponse.success('', userList, StatusCodes.OK);
-    res.status(response.statusCode).json(response);
-});
+
+app.use('/api/v1', v1Router);
 
 // Handle errors
 app.use(errorMiddleware);

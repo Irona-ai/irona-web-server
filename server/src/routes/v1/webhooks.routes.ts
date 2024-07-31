@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
-import WebhookController from '@/controller/webhook.controller';
+import WebhookController from '@/controllers/webhook.controller';
 import { clerkWebhookMiddleware } from '@/middleware/clerkWebhook';
 
 const webhooksRouter = Router();
@@ -13,4 +13,3 @@ webhooksRouter.post(
 );
 
 export default webhooksRouter;
-// start db -> env
