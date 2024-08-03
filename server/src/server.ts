@@ -7,12 +7,10 @@ import { healthCheckRouter } from '@/routes/healthCheck.routes';
 import { errorMiddleware, unexpectedRequest } from '@/middleware/errorHandler';
 import rateLimiter from '@/middleware/rateLimiter';
 import requestLogger from '@/middleware/requestLogger';
-import { env } from '@/utils/envConfig';
-import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import webhooksRouter from '@/routes/v1/webhooks.routes';
-import { ApiResponse } from '@/common/models/serviceResponse';
-import { StatusCodes } from 'http-status-codes';
 import v1Router from './routes/v1';
+import upsertUserMiddleware from '@/middleware/upsertUserMiddleware';
 
 const logger = pino({ name: 'server start' });
 const app = express();
@@ -40,13 +38,13 @@ app.use('/api/webhooks/v1/clerk', webhooksRouter);
 v1Router.use(express.json());
 
 app.use(ClerkExpressRequireAuth());
-// TODO: middleware to check if user exists in irona db in 2sec interval
+
+app.use(upsertUserMiddleware);
 
 app.use('/api/v1', v1Router);
 
 // Handle errors
 app.use(errorMiddleware);
-
 // Error handler 404
 app.use(unexpectedRequest);
 
