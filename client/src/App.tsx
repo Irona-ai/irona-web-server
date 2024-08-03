@@ -8,13 +8,17 @@ function App() {
     const { isSignedIn, user } = useUser()
     console.log('[USER]: ', user)
 
+    const getUser = async () => {
+        const data = await axios.get(SERVER_BASE_API + '/users')
+        console.log('data', data)
+    }
+
     useEffect(() => {
-        const getUser = async () => {
-            const data = await axios.get(SERVER_BASE_API + '/users')
-            console.log('data', data)
+        if (isSignedIn) {
+            getUser()
         }
-        getUser()
-    }, [])
+    }, [isSignedIn])
+
     return (
         <section>
             <Navbar />
@@ -23,6 +27,7 @@ function App() {
                     <h1 className="text-2xl">Hey👋 {user.fullName}</h1>
                 ) : null}
             </main>
+            <button onClick={getUser}>refresh</button>
         </section>
     )
 }
