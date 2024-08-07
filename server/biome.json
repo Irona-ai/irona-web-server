@@ -1,8 +1,17 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
     "formatter": {
+        "enabled": true,
         "indentStyle": "space",
         "lineWidth": 120
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "quoteProperties": "asNeeded",
+            "semicolons": "always",
+            "trailingCommas": "all"
+        }
     },
     "organizeImports": { "enabled": true },
     "linter": {
