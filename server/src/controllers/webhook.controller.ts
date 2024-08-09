@@ -52,8 +52,7 @@ class WebhookController {
             }
         } catch (error: any) {
             logger.error(eventData, error.message);
-            //TODO: check error.message
-            if (error.message === 'Database Error') {
+            if (error.type === 'PrismaClientInitializationError') {
                 const response = ApiResponse.failure(
                     'Internal Server Error: Database Error',
                     null,
