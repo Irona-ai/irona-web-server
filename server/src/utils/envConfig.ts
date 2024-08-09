@@ -14,4 +14,5 @@ export const env = cleanEnv(process.env, {
     CLERK_PUBLISHABLE_KEY: str({ devDefault: testOnly('pk_test_123') }),
     CLERK_SECRET_KEY: str({ devDefault: testOnly('sk_test_123') }),
     CLERK_WEBHOOK_SECRET: str({ devDefault: testOnly('whsec_test_123') }),
+    SALT: str({ devDefault: testOnly('salt_test_123') }),
 });
